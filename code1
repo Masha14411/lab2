@@ -1,0 +1,66 @@
+class TuringMachine {
+  constructor(alphabet, transitions) {
+    this.alphabet = alphabet;
+    this.transitions = transitions;
+    this.tape = [];
+    this.headPosition = 0;
+    this.currentState = '';
+    this.output = '';
+  }
+
+  setInitialState(state) {
+    this.currentState = state;
+  }
+
+  setTape(input) {
+    this.tape = input.split('');
+  }
+
+  run() {
+    while (true) {
+      const currentSymbol = this.tape[this.headPosition];
+      const transition = this.transitions[this.currentState][currentSymbol];
+
+      if (!transition) {
+        break;
+      }
+
+      const { writeSymbol, moveDirection, nextState } = transition;
+
+      this.tape[this.headPosition] = writeSymbol;
+      this.headPosition += moveDirection === 'R' ? 1 : -1;
+      this.currentState = nextState;
+      this.output += writeSymbol;
+    }
+  }
+
+  getOutput() {
+    return this.output;
+  }
+}
+
+// Приклад використання
+
+const alphabet = ['0', '1']; // Алфавіт
+const transitions = {
+  q0: {
+    '0': { writeSymbol: '1', moveDirection: 'R', nextState: 'q1' },
+    '1': { writeSymbol: '0', moveDirection: 'R', nextState: 'q2' },
+  },
+  q1: {
+    '0': { writeSymbol: '0', moveDirection: 'R', nextState: 'q1' },
+    '1': { writeSymbol: '1', moveDirection: 'R', nextState: 'q1' },
+  },
+  q2: {
+    '0': { writeSymbol: '1', moveDirection: 'L', nextState: 'q0' },
+    '1': { writeSymbol: '0', moveDirection: 'L', nextState: 'q2' },
+  },
+};
+
+const tm = new TuringMachine(alphabet, transitions);
+tm.setInitialState('q0'); // Початковий стан
+tm.setTape('0000000'); // Вхідна стрічка
+
+tm.run(); // Запускаємо машину Тюрінга
+
+console.log(tm.getOutput()); // Виводимо непусте слово
