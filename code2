@@ -1,0 +1,59 @@
+function turingMachine(tape, transitions, initialState, finalStates, speed) {
+  let state = initialState;
+  let position = 0;
+
+  while (!finalStates.includes(state)) {
+    const symbol = tape[position];
+
+    if (!(state in transitions) || !(symbol in transitions[state])) {
+      console.log('No transition found for current state and symbol.');
+      break;
+    }
+
+    const { newState, newSymbol, direction } = transitions[state][symbol];
+
+    const transitionsString = `Transitions: (${state}, ${symbol}) -> (${newState}, ${newSymbol}, ${direction})`;
+    const tapeString = 'Tape: ' + tape.slice(0, position).join('') + '[' + symbol + ']' + tape.slice(position + 1).join('');
+
+    console.log(transitionsString);
+    console.log(tapeString);
+    console.log();
+
+    tape[position] = newSymbol;
+    if (direction === 'R') {
+      position++;
+    } else if (direction === 'L') {
+      position--;
+    }
+
+    state = newState;
+    sleep(speed);
+  }
+
+  if (finalStates.includes(state)) {
+    console.log('Final state reached. Turing machine halted.');
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Приклад використання
+
+const tape = ['0', '1', '1', '0', '1', '0', '1', '1', '0'];
+const transitions = {
+  q0: {
+    '0': { newState: 'q1', newSymbol: '1', direction: 'R' },
+    '1': { newState: 'q0', newSymbol: '0', direction: 'L' },
+  },
+  q1: {
+    '0': { newState: 'q1', newSymbol: '0', direction: 'R' },
+    '1': { newState: 'q1', newSymbol: '1', direction: 'R' },
+  },
+};
+const initialState = 'q0';
+const finalStates = ['q1'];
+const speed = 1000; // Пауза між ітераціями у мілісекундах
+
+turingMachine(tape, transitions, initialState, finalStates, speed);
